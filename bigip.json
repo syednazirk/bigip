@@ -167,6 +167,12 @@
       },
       "type": "string"
     },
+    "licenseKey": {
+      "metadata": {
+        "description": "REQUIRED - Supply valid license Key."
+      },
+      "type": "string"
+    },    
     "tagValues": {
       "defaultValue": {
         "application": "APP",
