@@ -71,13 +71,7 @@
             }
         },
         "nsg2": {
-            "defaultValue": [
-                {
-                    "destinationPortRanges": ["80","443"],
-                    "sourceAddressPrefix": "",
-                    "protocol": "Tcp"
-                }
-            ],
+            "defaultValue": [],
             "type": "array",
             "metadata": {
                 "description": "Valid values include an array containing network security rule property objects, or an empty array. A non-empty array value creates a security group and inbound rules using the destinationPortRanges and sourceAddressPrefix values provided for each object."
