@@ -455,7 +455,7 @@
             "location": "[resourceGroup().location]",
             "tags": "[if(empty(parameters('tagValues')), json('null'), parameters('tagValues'))]",
             "properties": {
-                "securityRules": "[union(variables('nsg1Array'), variables('outboundNsgRule'))]"
+                "securityRules": []
             },
             "condition": "[not(empty(parameters('nsg1')))]"
         },
@@ -466,7 +466,7 @@
             "location": "[resourceGroup().location]",
             "tags": "[if(empty(parameters('tagValues')), json('null'), parameters('tagValues'))]",
             "properties": {
-                "securityRules": "[union(variables('nsg2Array'), variables('outboundNsgRule'))]"
+                "securityRules": []
             },
             "condition": "[not(empty(parameters('nsg2')))]"
         },
@@ -477,7 +477,7 @@
             "location": "[resourceGroup().location]",
             "tags": "[if(empty(parameters('tagValues')), json('null'), parameters('tagValues'))]",
             "properties": {
-                "securityRules": "[union(variables('nsg3Array'), variables('outboundNsgRule'))]"
+                "securityRules": []
             },
             "condition": "[not(empty(parameters('nsg3')))]"
         },
@@ -488,7 +488,7 @@
             "location": "[resourceGroup().location]",
             "tags": "[if(empty(parameters('tagValues')), json('null'), parameters('tagValues'))]",
             "properties": {
-                "securityRules": "[union(variables('nsg4Array'), variables('outboundNsgRule'))]"
+                "securityRules": []
             },
             "condition": "[not(empty(parameters('nsg4')))]"
         },
