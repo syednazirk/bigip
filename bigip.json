@@ -381,7 +381,7 @@
             "ssh": {
                 "publicKeys": [
                     {
-                        "keyData": "[parameter('sshKey')]",
+                        "keyData": "[parameters('sshKey')]",
                         "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]"
                     }
                 ]
