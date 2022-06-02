@@ -92,7 +92,7 @@
       "type": "string"
     },
     "secret": {
-      "defaultValue": "autofwf5@123#",
+      "defaultValue": "",
       "type": "securestring",
       "metadata": {
         "description": "Password should be min 11 characters and comnination of atleast one lower case character, one upper case character, one numeral and one special character limited to (% * + , - . / : = ? [ ] ^ _ ~ space# )"
