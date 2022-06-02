@@ -458,8 +458,6 @@
       "name": "[variables('networkInterfaceName2')]",
       "properties": {
         "ipConfigurations": "[variables('ipConfigurationsNic2')]",
-        "networkSecurityGroup": {
-          "id": "[parameters('nic2NsgId')]"
         }
       },
       "tags": "[union(variables('cfeTagValue'), json(concat('{\"f5_cloud_failover_nic_map\": \"nic2\"}')))]",
