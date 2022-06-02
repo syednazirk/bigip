@@ -112,7 +112,7 @@ extension_services:
           admin:
             class: User
             userType: regular
-            password: 'autofwf5@123#'
+            password: 'PASSWD'
             shell: bash
           default:
             class: ManagementRoute
