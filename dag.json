@@ -42,13 +42,8 @@
         "nsg0": {
             "defaultValue": [
                 {
-                    "destinationPortRanges": ["22","8443"],
-                    "sourceAddressPrefix": "",
-                    "protocol": "Tcp"
-                },
-                {
-                    "destinationPortRanges": ["80","443"],
-                    "sourceAddressPrefix": "",
+                    "destinationPortRanges": ["22","443"],
+                    "sourceAddressPrefixes": [],
                     "protocol": "Tcp"
                 }
             ],
@@ -60,9 +55,9 @@
         "nsg1": {
             "defaultValue": [
                 {
-                    "destinationPortRanges": ["80","443"],
-                    "sourceAddressPrefix": "",
-                    "protocol": "Tcp"
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "protocol": "*"
                 }
             ],
             "type": "array",
@@ -244,7 +239,7 @@
                         "direction": "Inbound",
                         "priority": "[int(concat('10', copyIndex('constructNsg0Array')))]",
                         "protocol": "[parameters('nsg0')[copyIndex('constructNsg0Array')].protocol]",
-                        "sourceAddressPrefix": "[parameters('nsg0')[copyIndex('constructNsg0Array')].sourceAddressPrefix]",
+                        "sourceAddressPrefixes": "[parameters('nsg0')[copyIndex('constructNsg0Array')].sourceAddressPrefixes]",
                         "sourcePortRange": "*"
                     }
                 },
@@ -262,7 +257,7 @@
                         "direction": "Inbound",
                         "priority": "[int(concat('10', copyIndex('constructNsg1Array')))]",
                         "protocol": "[parameters('nsg1')[copyIndex('constructNsg1Array')].protocol]",
-                        "sourceAddressPrefix": "[parameters('nsg1')[copyIndex('constructNsg1Array')].sourceAddressPrefix]",
+                        "sourceAddressPrefixes": "[parameters('nsg1')[copyIndex('constructNsg1Array')].sourceAddressPrefixes]",
                         "sourcePortRange": "*"
                     }
                 },
@@ -280,7 +275,7 @@
                         "direction": "Inbound",
                         "priority": "[int(concat('10', copyIndex('constructNsg2Array')))]",
                         "protocol": "[parameters('nsg2')[copyIndex('constructNsg2Array')].protocol]",
-                        "sourceAddressPrefix": "[parameters('nsg2')[copyIndex('constructNsg2Array')].sourceAddressPrefix]",
+                        "sourceAddressPrefixes": "[parameters('nsg2')[copyIndex('constructNsg2Array')].sourceAddressPrefixes]",
                         "sourcePortRange": "*"
                     }
                 },
@@ -298,7 +293,7 @@
                         "direction": "Inbound",
                         "priority": "[int(concat('10', copyIndex('constructNsg3Array')))]",
                         "protocol": "[parameters('nsg3')[copyIndex('constructNsg3Array')].protocol]",
-                        "sourceAddressPrefix": "[parameters('nsg3')[copyIndex('constructNsg3Array')].sourceAddressPrefix]",
+                        "sourceAddressPrefixes": "[parameters('nsg3')[copyIndex('constructNsg3Array')].sourceAddressPrefixes]",
                         "sourcePortRange": "*"
                     }
                 },
@@ -316,7 +311,7 @@
                         "direction": "Inbound",
                         "priority": "[int(concat('10', copyIndex('constructNsg4Array')))]",
                         "protocol": "[parameters('nsg4')[copyIndex('constructNsg4Array')].protocol]",
-                        "sourceAddressPrefix": "[parameters('nsg4')[copyIndex('constructNsg4Array')].sourceAddressPrefix]",
+                        "sourceAddressPrefixes": "[parameters('nsg4')[copyIndex('constructNsg4Array')].sourceAddressPrefixes]",
                         "sourcePortRange": "*"
                     }
                 },
