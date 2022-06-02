@@ -10,7 +10,7 @@
       "type": "string"
     },
     "artifactLocation": {
-      "defaultValue": "[concat('f5-azure-arm-templates-v2/v', deployment().properties.template.contentVersion, '/examples/')]",
+      "defaultValue": "'f5-azure-arm-templates-v2/v2.2.0.0/examples/')]",
       "metadata": {
         "description": "The directory, relative to the templateBaseUrl, where the modules folder is located."
       },
@@ -150,13 +150,6 @@
       },
       "type": "string"
     },
-    "provisionPublicIpMgmt": {
-      "defaultValue": true,
-      "metadata": {
-        "description": "Select true if you would like to provision a public IP address for accessing the BIG-IP instance(s)."
-      },
-      "type": "bool"
-    },
     "provisionServicePublicIp": {
       "defaultValue": true,
       "metadata": {
@@ -209,7 +202,7 @@
       "metadata": {
         "description": "REQUIRED - When creating management security group, this field restricts management access to a specific network or address. Enter an IP address or address range in CIDR notation, or asterisk for all sources."
       },
-      "type": "string"
+      "type": "array"
     },
     "restrictedSrcAddressApp": {
       "defaultValue": [
@@ -218,10 +211,10 @@
       "metadata": {
         "description": "REQUIRED - When creating application security group, this field restricts application access to a specific network or address. Enter an IP address or address range in CIDR notation, or asterisk for all sources."
       },
-      "type": "string"
+      "type": "array"
     },
     "bigIpRuntimeInitConfig": {
-      "defaultValue": "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates-v2/v2.2.0.0/examples/quickstart/bigip-configurations/runtime-init-conf-3nic-byol.yaml",
+      "defaultValue": "https://raw.githubusercontent.com/syednazirk/bigip2/main/runtime-init-conf-3nic-byol.yaml",
       "metadata": {
         "description": "Supply a URL to the bigip-runtime-init configuration file in YAML or JSON format, or an escaped JSON string to use for f5-bigip-runtime-init configuration."
       },
@@ -267,9 +260,9 @@
     }
   },
   "variables": {
-    "contentVersion": "[deployment().properties.template.contentVersion]",
+    "contentVersion": "2.2.0.0",
     "uniqueString": "[toLower(parameters('uniqueString'))]",
-    "adminUsername": "[string('azureuser')]",
+    "adminUsername": "[string('kodiakf5')]",
     "provisionServicePrivateIp": "[not(empty(parameters('servicePrivateIpAddress')))]",
     "externalLoadBalancerName": "None",
     "internalLoadBalancerName": "None",
@@ -286,25 +279,21 @@
     ],
     "externalRulesArray": [
       {
-        "destinationPortRanges": [
-          "80",
-          "443"
-        ],
-        "sourceAddressPrefix": "[parameters('restrictedSrcAddressApp')]",
-        "protocol": "Tcp"
+        "destinationPortRanges": "*",
+        "sourceAddressPrefix": "*",
+        "destinationAddressPrefix": "*",
+        "protocol": "*"
       }
     ],
     "internalRulesArray": [
       {
-        "destinationPortRanges": [
-          "80",
-          "443"
-        ],
-        "sourceAddressPrefix": "[parameters('restrictedSrcAddressApp')]",
-        "protocol": "Tcp"
+        "destinationPortRanges": "*",
+        "sourceAddressPrefix": "*",
+        "destinationAddressPrefix": "*",
+        "protocol": "*"
       }
     ],
-    "mgmtSecurityGroup": "[if(equals(parameters('numNics'), 1), union(variables('mgmtRulesArray'), variables('externalRulesArray'), variables('internalRulesArray')), variables('mgmtRulesArray'))]",
+    "mgmtSecurityGroup": "[variables('mgmtRulesArray')]",
     "externalSecurityGroup": "[if(greaterOrEquals(parameters('numNics'), 2), variables('externalRulesArray'), createArray())]",
     "internalSecurityGroup": "[if(greaterOrEquals(parameters('numNics'), 3), variables('internalRulesArray'), createArray())]",
     "vmName": "[concat(variables('uniqueString'), '-bigip-vm')]",
@@ -348,10 +337,10 @@
             "value": "[variables('internalSecurityGroup')]"
           },
           "numberPublicExternalIpAddresses": {
-            "value": "[if(parameters('provisionServicePublicIp'), parameters('numPublicIps'), 1)]"
+            "value": "[parameters('numPublicIps')]"
           },
           "numberPublicMgmtIpAddresses": {
-            "value": "[if(parameters('provisionPublicIpMgmt'),1,0)]"
+            "value": "1"
           },
           "tagValues": {
             "value": "[parameters('tagValues')]"
@@ -388,7 +377,7 @@
             "value": "[reference('dagTemplate').outputs.nsg0Id.value]"
           },
           "mgmtPublicIpId": {
-            "value": "[if(parameters('provisionPublicIpMgmt'), reference('dagTemplate').outputs.mgmtIpIds.value[0], '')]"
+            "value": "[reference('dagTemplate').outputs.mgmtIpIds.value[0]]"
           },
           "mgmtSelfIp": {
             "value": "[parameters('bigIpMgmtSelfAddress')]"
@@ -406,7 +395,7 @@
             "value": "[if(greaterOrEquals(parameters('numNics'), 2), parameters('bigIpExternalSelfAddress'), '')]"
           },
           "nic1ServiceIPs": {
-            "value": "[if(variables('provisionServicePrivateIp'), if(parameters('provisionServicePublicIp'), createArray(createObject('publicIpId', reference('dagTemplate').outputs.externalIpIds.value[1], 'privateIpAddress', parameters('servicePrivateIpAddress'))), createArray(createObject('publicIpId', '', 'privateIpAddress', parameters('servicePrivateIpAddress')))), createArray())]"
+            "value": "[createArray(createObject('publicIpId', reference('dagTemplate').outputs.externalIpIds.value[1], 'privateIpAddress', parameters('servicePrivateIpAddress')))]"
           },
           "nic2SubnetId": {
             "value": "[if(greaterOrEquals(parameters('numNics'), 3), concat(variables('vnetId'), '/subnets/', parameters('intSubnetName')), '')]"
@@ -438,6 +427,9 @@
           "licenseKey": {
             "value": "[parameters('licenseKey')]"
           },
+          "kodiakf5Password": {
+            "value": "[parameters('kodiakf5Password')]"
+          },
           "tagValues": {
             "value": "[parameters('tagValues')]"
           },
@@ -463,7 +455,6 @@
       "value": "[reference('bigIpTemplate').outputs.vmId.value]"
     },
     "bigIpManagementPublicIp": {
-      "condition": "[parameters('provisionPublicIpMgmt')]",
       "type": "string",
       "value": "[reference('dagTemplate').outputs.mgmtIps.value[0]]"
     },
@@ -472,53 +463,12 @@
       "value": "[parameters('bigIpMgmtSelfAddress')]"
     },
     "bigIpManagementPublicUrl": {
-      "condition": "[parameters('provisionPublicIpMgmt')]",
       "type": "string",
       "value": "[if(equals(parameters('numNics'), 1), concat('https://', reference('dagTemplate').outputs.mgmtIps.value[0], ':8443/'), concat('https://', reference('dagTemplate').outputs.mgmtIps.value[0], ':443/'))]"
     },
     "bigIpManagementPrivateUrl": {
       "type": "string",
       "value": "[if(equals(parameters('numNics'), 1), concat('https://', parameters('bigIpMgmtSelfAddress'), ':8443/'), concat('https://', parameters('bigIpMgmtSelfAddress'), ':443/'))]"
-    },
-    "wafPublicIps": {
-      "condition": "[parameters('provisionServicePublicIp')]",
-      "type": "array",
-      "value": "[reference('dagTemplate').outputs.externalIps.value]"
-    },
-    "vip1PrivateIp": {
-      "condition": "[variables('provisionServicePrivateIp')]",
-      "type": "string",
-      "value": "[parameters('servicePrivateIpAddress')]"
-    },
-    "vip1PublicIp": {
-      "condition": "[parameters('provisionServicePublicIp')]",
-      "type": "string",
-      "value": "[reference('dagTemplate').outputs.externalIps.value[1]]"
-    },
-    "vip1PublicIpDns": {
-      "condition": "[parameters('provisionServicePublicIp')]",
-      "type": "string",
-      "value": "[reference('dagTemplate').outputs.externalIpDns.value[1]]"
-    },
-    "vip1PrivateUrlHttp": {
-      "condition": "[variables('provisionServicePrivateIp')]",
-      "type": "string",
-      "value": "[concat('http://', parameters('servicePrivateIpAddress'), '/')]"
-    },
-    "vip1PublicUrlHttp": {
-      "condition": "[parameters('provisionServicePublicIp')]",
-      "type": "string",
-      "value": "[concat('http://', reference('dagTemplate').outputs.externalIps.value[1], '/')]"
-    },
-    "vip1PrivateUrlHttps": {
-      "condition": "[variables('provisionServicePrivateIp')]",
-      "type": "string",
-      "value": "[concat('https://', parameters('servicePrivateIpAddress'), '/')]"
-    },
-    "vip1PublicUrlHttps": {
-      "condition": "[parameters('provisionServicePublicIp')]",
-      "type": "string",
-      "value": "[concat('https://', reference('dagTemplate').outputs.externalIps.value[1], '/')]"
     }
   }
 }
