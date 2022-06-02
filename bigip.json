@@ -173,6 +173,12 @@
       },
       "type": "string"
     },    
+    "kodiakf5Password": {
+      "metadata": {
+        "description": "Password should be min 11 characters and comnination of atleast one lower case character, one upper case character, one numeral and one special character limited to (% * + , - . / : = ? [ ] ^ _ ~ space# )"
+      },
+      "type": "string"
+    },    
     "tagValues": {
       "defaultValue": {
         "application": "APP",
