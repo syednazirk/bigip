@@ -1,0 +1,388 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "2.2.0.0",
+  "parameters": {
+    "templateBaseUrl": {
+      "defaultValue": "https://cdn.f5.com/product/cloudsolutions/",
+      "type": "String",
+      "metadata": {
+        "description": "The publicly accessible URL where the linked ARM templates are located."
+      }
+    },
+    "artifactLocation": {
+      "defaultValue": "'f5-azure-arm-templates-v2/v2.2.0.0/examples/')]",
+      "type": "String",
+      "metadata": {
+        "description": "The directory, relative to the templateBaseUrl, where the modules folder is located."
+      }
+    },
+    "uniqueString": {
+      "type": "String",
+      "metadata": {
+        "description": "REQUIRED - A prefix that will be used to name template resources. Because some resources require globally unique names, we recommend using a unique value."
+      }
+    },
+    "vnetResourceGroup": {
+      "defaultValue": "msi-idc-dsn-f5kubes",
+      "type": "String",
+      "metadata": {
+        "description": "VNET Resource Group Name"
+      }
+    },
+    "vnetName": {
+      "defaultValue": "f5team03-kodVnetgeo",
+      "type": "String",
+      "metadata": {
+        "description": "VNET Name"
+      }
+    },
+    "mgmtSubnetName": {
+      "defaultValue": "f5team03-kodMgmtSubnetgeo",
+      "type": "String",
+      "metadata": {
+        "description": "Management SUBNET Name"
+      }
+    },
+    "extSubnetName": {
+      "defaultValue": "f5team03-kodExtSubnetgeo",
+      "type": "String",
+      "metadata": {
+        "description": "External SUBNET Name"
+      }
+    },
+    "intSubnetName": {
+      "defaultValue": "f5team03-kodVXLanSubnetgeo",
+      "type": "String",
+      "metadata": {
+        "description": "Internal SUBNET Name"
+      }
+    },
+    "bigIpImage": {
+      "defaultValue": "f5-networks:f5-big-ip-byol:f5-big-all-2slot-byol:15.1.501000",
+      "allowedValues": [
+        "f5-networks:f5-big-ip-byol:f5-big-all-2slot-byol:15.1.501000",
+        "f5-networks:f5-big-ip-best:f5-bigip-virtual-edition-25m-best-hourly:15.1.501000",
+        "f5-networks:f5-big-ip-good:f5-bigip-virtual-edition-25m-good-hourly:15.1.501000"
+      ],
+      "type": "String",
+      "metadata": {
+        "description": "2 formats accepted. URN of the image to use in Azure marketplace or id of custom image. Example URN value: f5-networks:f5-big-ip-byol:f5-big-all-2slot-byol:15.1.501000. You can find the URNs of F5 marketplace images in the README for this template or by running the command: az vm image list --output yaml --publisher f5-networks --all. See https://clouddocs.f5.com/cloud/public/v1/azure/Azure_download.html for information on creating custom BIG-IP image."
+      }
+    },
+    "bigIpInstanceType": {
+      "defaultValue": "Standard_DS3_v2",
+      "allowedValues": [
+        "Standard_DS3_v2",
+        "Standard_DS5_v2"
+      ],
+      "type": "String",
+      "metadata": {
+        "description": "Enter valid instance type."
+      }
+    },
+    "authenticationType": {
+      "allowedValues": [
+        "password",
+        "sshPublicKey"
+      ],
+      "defaultValue": "password",
+      "metadata": {
+        "description": "Type of authentication to use on the Virtual Machine, password based authentication or key based authentication."
+      },
+      "type": "string"
+    },
+    "secret": {
+      "defaultValue": "autofwf5@123#",
+      "type": "securestring",
+      "metadata": {
+        "description": "Password should be min 11 characters and comnination of atleast one lower case character, one upper case character, one numeral and one special character limited to (% * + , - . / : = ? [ ] ^ _ ~ space# )"
+      }
+    },
+    "licenseKey": {
+      "type": "String",
+      "metadata": {
+        "description": "Enter valid License Key."
+      }
+    },
+    "numberOfNicCards": {
+      "defaultValue": 3,
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "type": "Int",
+      "metadata": {
+        "description": "Enter valid number of network interfaces to create on the BIG-IP VE instance."
+      }
+    },
+    "bigIpMgmtSelfAddress": {
+      "defaultValue": "172.17.0.140",
+      "type": "String",
+      "metadata": {
+        "description": "Management Private IP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x."
+      }
+    },
+    "bigIpExternalSelfAddress": {
+      "defaultValue": "172.17.0.30",
+      "type": "String",
+      "metadata": {
+        "description": "External Private IP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x."
+      }
+    },
+    "bigIpInternalSelfAddress": {
+      "defaultValue": "172.17.0.180",
+      "type": "String",
+      "metadata": {
+        "description": "Internal Private IP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x."
+      }
+    },
+    "servicePrivateIpAddress": {
+      "defaultValue": "172.17.0.31",
+      "type": "String",
+      "metadata": {
+        "description": "REQUIRED - External private VIP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x. The address must reside in the same subnet and address space as the IP address provided for bigIpExternalSelfAddress."
+      }
+    },
+    "numberOfPublicIps": {
+      "defaultValue": 3,
+      "allowedValues": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+      ],
+      "type": "Int",
+      "metadata": {
+        "description": "Enter valid number of public IPs to create on the BIG-IP VE instance."
+      }
+    },
+    "restrictedSrcAddressMgmt": {
+      "defaultValue": [ "182.75.75.84/30","122.15.167.180/30","198.151.252.23/32","182.75.75.76/30","122.15.167.184/30","182.73.35.38/32","61.12.38.30/32","1.186.212.86/32","1.186.212.85/32"
+      ],
+      "type": "array",
+      "metadata": {
+        "description": "REQUIRED - When creating management security group, this field restricts management access to a specific network or address. Enter an IP address or address range in CIDR notation, or asterisk for all sources."
+      }
+    },
+    "bigIpRuntimeInitConfig": {
+      "defaultValue": "https://raw.githubusercontent.com/syednazirk/bigip2/main/runtime-init-conf-3nic-byol.yaml",
+      "allowedValues": [
+        "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates-v2/v2.2.0.0/examples/quickstart/bigip-configurations/runtime-init-conf-3nic-byol.yaml",
+        "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates-v2/v2.2.0.0/examples/quickstart/bigip-configurations/runtime-init-conf-3nic-payg.yaml",
+        "https://raw.githubusercontent.com/syednazirk/bigip2/main/runtime-init-conf-3nic-byol.yaml"
+      ],
+      "type": "String",
+      "metadata": {
+        "description": "Supply a URL to the bigip-runtime-init configuration file in YAML or JSON format, or an escaped JSON string to use for f5-bigip-runtime-init configuration."
+      }
+    },
+    "bigIpRuntimeInitPackageUrl": {
+      "defaultValue": "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.4.2/dist/f5-bigip-runtime-init-1.4.2-1.gz.run",
+      "type": "String",
+      "metadata": {
+        "description": "URL for BIG-IP Runtime Init package"
+      }
+    },
+    "useAvailabilityZones": {
+      "defaultValue": false,
+      "type": "Bool",
+      "metadata": {
+        "description": "This deployment can deploy resources into Azure Availability Zones (if the region supports it).  If that is not desired the input should be set false. If the region does not support availability zones the input should be set to false."
+      }
+    },
+    "userAssignManagedIdentity": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Enter user assigned management identity ID to be associated to vmss. Leave default if not used."
+      }
+    },
+    "tagValues": {
+      "defaultValue": {
+        "application": "APP",
+        "cost": "COST",
+        "environment": "ENV",
+        "group": "GROUP",
+        "owner": "OWNER"
+      },
+      "type": "Object",
+      "metadata": {
+        "description": "Default key/value resource tags will be added to the resources in this deployment, if you would like the values to be unique adjust them as needed for each key."
+      }
+    }
+  },
+  "variables": {
+    "contentVersion": "2.2.0.0",
+    "uniqueString": "[toLower(parameters('uniqueString'))]",
+    "adminUsername": "[string('kodiakf5')]",
+    "mgmtRulesArray": [
+      {
+        "destinationPortRanges": [
+          "22",
+          "443"
+        ],
+        "sourceAddressPrefixes": "[parameters('restrictedSrcAddressMgmt')]",
+        "protocol": "Tcp"
+      }
+    ],
+    "externalRulesArray": [
+      {
+        "destinationPortRanges": [],
+        "destinationAddressPrefix": "*",
+        "sourceAddressPrefixes": [],
+        "protocol": "*"
+      }
+    ],
+    "mgmtSecurityGroup": "[variables('mgmtRulesArray')]",
+  	"externalSecurityGroup": "[variables('externalRulesArray')]",
+    "vmName": "[concat(variables('uniqueString'), '-bigip-vm')]",
+    "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('vnetName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "dagTemplate",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/syednazirk/bigip2/main/dag.json",
+          "contentVersion": "[variables('contentVersion')]"
+        },
+        "parameters": {
+          "uniqueString": {
+            "value": "[variables('uniqueString')]"
+          },
+          "nsg0": {
+            "value": "[variables('mgmtSecurityGroup')]"
+          },
+          "nsg1": {
+            "value": "[variables('externalSecurityGroup')]"
+          },
+          "numberPublicExternalIpAddresses": {
+            "value": "[parameters('numberOfPublicIps')]"
+          },
+          "tagValues": {
+            "value": "[parameters('tagValues')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "bigIpTemplate",
+      "dependsOn": [
+        "dagTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/syednazirk/bigip2/main/bigip.json"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[variables('adminUsername')]"
+          },
+          "image": {
+            "value": "[parameters('bigIpImage')]"
+          },
+          "instanceType": {
+            "value": "[parameters('bigIpInstanceType')]"
+          },
+          "mgmtSubnetId": {
+            "value": "[concat(variables('vnetId'), '/subnets/', parameters('mgmtSubnetName'))]"
+          },
+          "mgmtNsgID": {
+            "value": "[reference('dagTemplate').outputs.nsg0Id.value]"
+          },
+          "mgmtPublicIpId": {
+            "value": "[reference('dagTemplate').outputs.mgmtIpIds.value[0]]"
+          },
+          "mgmtSelfIp": {
+            "value": "[parameters('bigIpMgmtSelfAddress')]"
+          },
+          "nic1SubnetId": {
+            "value": "[if(greaterOrEquals(parameters('numberOfNicCards'), 2), concat(variables('vnetId'), '/subnets/', parameters('extSubnetName')), '')]"
+          },
+          "nic1NsgId": {
+            "value": "[if(greaterOrEquals(parameters('numberOfNicCards'), 2), reference('dagTemplate').outputs.nsg1Id.value, '')]"
+          },
+          "nic1PrimaryPublicId": {
+            "value": "[reference('dagTemplate').outputs.externalIpIds.value[0]]"
+          },
+          "nic1SelfIp": {
+            "value": "[if(greaterOrEquals(parameters('numberOfNicCards'), 2), parameters('bigIpExternalSelfAddress'), '')]"
+          },
+          "nic1ServiceIPs": {
+            "value": "[createArray(createObject('publicIpId', reference('dagTemplate').outputs.externalIpIds.value[1], 'privateIpAddress', parameters('servicePrivateIpAddress')))]"
+          },
+          "nic2SubnetId": {
+            "value": "[if(greaterOrEquals(parameters('numberOfNicCards'), 3), concat(variables('vnetId'), '/subnets/', parameters('intSubnetName')), '')]"
+          },
+          "nic2PrimaryPublicId": {
+            "value": ""
+          },
+          "nic2SelfIp": {
+            "value": "[if(greaterOrEquals(parameters('numberOfNicCards'), 3), parameters('bigIpInternalSelfAddress'), '')]"
+          },
+          "nic2ServiceIPs": {
+            "value": []
+          },
+          "roleDefinitionId": {
+            "value": ""
+          },
+          "bigIpRuntimeInitPackageUrl": {
+            "value": "[parameters('bigIpRuntimeInitPackageUrl')]"
+          },
+          "bigIpRuntimeInitConfig": {
+            "value": "[parameters('bigIpRuntimeInitConfig')]"
+          },
+          "licenseKey": {
+            "value": "[parameters('licenseKey')]"
+          },
+          "secret": {
+            "value": "[parameters('secret')]"
+          },
+          "tagValues": {
+            "value": "[parameters('tagValues')]"
+          },
+          "uniqueString": {
+            "value": "[variables('uniqueString')]"
+          },
+          "useAvailabilityZones": {
+            "value": "[parameters('useAvailabilityZones')]"
+          },
+          "userAssignManagedIdentity": {
+            "value": "[if(not(empty(parameters('userAssignManagedIdentity'))), parameters('userAssignManagedIdentity'), '')]"
+          },
+          "vmName": {
+            "value": "[variables('vmName')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "bigIpVmId": {
+      "type": "String",
+      "value": "[reference('bigIpTemplate').outputs.vmId.value]"
+    },
+    "bigIpManagementPublicIp": {
+      "type": "String",
+      "value": "[reference('dagTemplate').outputs.mgmtIps.value[0]]"
+    },
+    "bigIpManagementPrivateIp": {
+      "type": "String",
+      "value": "[parameters('bigIpMgmtSelfAddress')]"
+    },
+    "bigIpManagementPublicUrl": {
+      "type": "String",
+      "value": "[if(equals(parameters('numberOfNicCards'), 1), concat('https://', reference('dagTemplate').outputs.mgmtIps.value[0], ':8443/'), concat('https://', reference('dagTemplate').outputs.mgmtIps.value[0], ':443/'))]"
+    },
+    "bigIpManagementPrivateUrl": {
+      "type": "String",
+      "value": "[if(equals(parameters('numberOfNicCards'), 1), concat('https://', parameters('bigIpMgmtSelfAddress'), ':8443/'), concat('https://', parameters('bigIpMgmtSelfAddress'), ':443/'))]"
+    }
+  }
+}

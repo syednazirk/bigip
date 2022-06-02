@@ -30,10 +30,7 @@
             "type": "string"
         },
         "loadBalancerRulePorts": {
-            "defaultValue": [
-                "80",
-                "443"
-            ],
+            "defaultValue": [],
             "metadata": {
                 "description": "Valid values include valid tcp ports. Enter an array of ports your applications use. Example: '[80,443,445]'"
             },
@@ -107,7 +104,7 @@
             "type": "int"
         },
         "numberPublicMgmtIpAddresses": {
-            "defaultValue": 0,
+            "defaultValue": 1,
             "allowedValues": [
                 0,
                 1,
