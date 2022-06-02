@@ -112,7 +112,7 @@ extension_services:
           admin:
             class: User
             userType: regular
-            password: '{{{BIGIP_PASSWORD}}}'
+            password: 'autofwf5@123#'
             shell: bash
           default:
             class: ManagementRoute
