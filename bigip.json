@@ -457,7 +457,7 @@
       "location": "[resourceGroup().location]",
       "name": "[variables('networkInterfaceName2')]",
       "properties": {
-        "ipConfigurations": "[variables('ipConfigurationsNic2')]",
+        "ipConfigurations": "[variables('ipConfigurationsNic2')]"
         }
       },
       "tags": "[union(variables('cfeTagValue'), json(concat('{\"f5_cloud_failover_nic_map\": \"nic2\"}')))]",
