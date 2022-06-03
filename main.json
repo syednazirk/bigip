@@ -23,7 +23,7 @@
       }
     },
     "vnetResourceGroup": {
-      "defaultValue": "msi-idc-dsn-f5kubes",
+      "defaultValue": "",
       "type": "String",
       "metadata": {
         "description": "VNET Resource Group Name"
@@ -157,8 +157,7 @@
       }
     },
     "restrictedSrcAddressMgmt": {
-      "defaultValue": [ "182.75.75.84/30","122.15.167.180/30","198.151.252.23/32","182.75.75.76/30","122.15.167.184/30","182.73.35.38/32","61.12.38.30/32","1.186.212.86/32","1.186.212.85/32"
-      ],
+      "defaultValue": [],
       "type": "array",
       "metadata": {
         "description": "REQUIRED - When creating management security group, this field restricts management access to a specific network or address. Enter an IP address or address range in CIDR notation, or asterisk for all sources."
