@@ -8,16 +8,16 @@ param location string = ''
 param vnetResourceGroup string = ''
 
 @description('VNET Name')
-param vnetName string = 'f5team03-kodVnetgeo'
+param vnetName string = ''
 
 @description('Management SUBNET Name')
-param mgmtSubnetName string = 'f5team03-kodMgmtSubnetgeo'
+param mgmtSubnetName string = ''
 
 @description('External SUBNET Name')
-param extSubnetName string = 'f5team03-kodExtSubnetgeo'
+param extSubnetName string = ''
 
 @description('Internal SUBNET Name')
-param intSubnetName string = 'f5team03-kodVXLanSubnetgeo'
+param intSubnetName string = ''
 
 @description('2 formats accepted. URN of the image to use in Azure marketplace or id of custom image. Example URN value: f5-networks:f5-big-ip-byol:f5-big-all-2slot-byol:15.1.501000. You can find the URNs of F5 marketplace images in the README for this template or by running the command: az vm image list --output yaml --publisher f5-networks --all. See https://clouddocs.f5.com/cloud/public/v1/azure/Azure_download.html for information on creating custom BIG-IP image.')
 @allowed([
@@ -59,16 +59,16 @@ param licenseKey string
 param numberOfNicCards int = 3
 
 @description('Management Private IP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x.')
-param bigIpMgmtSelfAddress string = '172.17.0.140'
+param bigIpMgmtSelfAddress string = ''
 
 @description('External Private IP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x.')
-param bigIpExternalSelfAddress string = '172.17.0.30'
+param bigIpExternalSelfAddress string = ''
 
 @description('Internal Private IP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x.')
-param bigIpInternalSelfAddress string = '172.17.0.180'
+param bigIpInternalSelfAddress string = ''
 
 @description('REQUIRED - External private VIP Address for BIGIP Instance. IP address parameter must be in the form x.x.x.x. The address must reside in the same subnet and address space as the IP address provided for bigIpExternalSelfAddress.')
-param servicePrivateIpAddress string = '172.17.0.31'
+param servicePrivateIpAddress string = ''
 
 @description('Enter valid number of public IPs to create on the BIG-IP VE instance.')
 @allowed([
