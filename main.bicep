@@ -162,7 +162,7 @@ var extServicePrivateIpAddressArray = split(servicePrivateIpAddress, '.')
 var extServicePrivateIpAddrPrefix = '${extServicePrivateIpAddressArray[0]}.${extServicePrivateIpAddressArray[1]}.${extServicePrivateIpAddressArray[2]}'
 var extServicePrivateIpAddrSuffixInt = int(extServicePrivateIpAddressArray[3])
 
-module dagTemplate 'ts:bd9593b1-8217-4859-b4cb-940a1e410122/MSI-IDC-DSN-F5KUBES/dagTemplate:2.0' = {
+module dagTemplate 'ts:bd9593b1-8217-4859-b4cb-940a1e410122/MSI-IDC-DSN-F5KUBES/dagTemplate:3.0' = {
   name: 'dagTemplate'
   params: {
     uniqueString: uniqueString_var
@@ -174,10 +174,11 @@ module dagTemplate 'ts:bd9593b1-8217-4859-b4cb-940a1e410122/MSI-IDC-DSN-F5KUBES/
   }
 }
 
-module bigIpTemplate 'ts:bd9593b1-8217-4859-b4cb-940a1e410122/MSI-IDC-DSN-F5KUBES/bigipTemplate:2.0' = {
+module bigIpTemplate 'ts:bd9593b1-8217-4859-b4cb-940a1e410122/MSI-IDC-DSN-F5KUBES/bigipTemplate:3.0' = {
   name: 'bigIpTemplate'
   params: {
     adminUsername: adminUsername
+    location: location
     image: bigIpImage
     instanceType: bigIpInstanceType
     mgmtSubnetId: '${vnetId}/subnets/${mgmtSubnetName}'
