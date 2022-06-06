@@ -1,6 +1,9 @@
 @description('REQUIRED - A prefix that will be used to name template resources. Because some resources require globally unique names, we recommend using a unique value.')
 param uniqueString string
 
+@description('Region Name')
+param location string = ''
+
 @description('VNET Resource Group Name')
 param vnetResourceGroup string = ''
 
@@ -163,6 +166,7 @@ module dagTemplate 'ts:bd9593b1-8217-4859-b4cb-940a1e410122/MSI-IDC-DSN-F5KUBES/
   name: 'dagTemplate'
   params: {
     uniqueString: uniqueString_var
+    location: location
     nsg0: mgmtSecurityGroup
     nsg1: externalSecurityGroup
     numberPublicExternalIpAddresses: numberOfPublicIps
