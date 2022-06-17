@@ -1,85 +1,74 @@
 {
-  "type": "Microsoft.Resources/deployments",
-  "apiVersion": "2020-10-01",
-  "name": "nestedTemplate",
-  "properties": {
-    "mode": "Incremental",
-    "template": {
-      "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-      "contentVersion": "1.0.0.0",
-      "metadata": {
-        "_generator": {
-          "name": "bicep",
-          "version": "0.7.4.23292",
-          "templateHash": "16918782523601006795"
-        }
-      },
-      "parameters": {
-        "uniqueString": {
-          "type": "string"
-        },
-        "location": {
-          "type": "string"
-        },
-        "tagValues": {
-          "type": "object"
-        },
-        "vnet": {
-          "type": "object",
-          "defaultValue": {
-            "vnetPrefix": "10.0.0.0/16",
-            "subnets": [
-              {
-                "name": "mgmt",
-                "prefix": "10.1.0.0/24"
-              },
-              {
-                "name": "ext",
-                "prefix": "10.2.0.0/24"
-              },
-              {
-                "name": "int",
-                "prefix": "10.3.0.0/24"
-              },
-              {
-                "name": "ext2",
-                "prefix": "10.4.0.0/24"
-              }
-            ]
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.7.4.23292",
+      "templateHash": "16918782523601006795"
+    }
+  },
+  "parameters": {
+    "uniqueString": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "tagValues": {
+      "type": "object"
+    },
+    "vnet": {
+      "type": "object",
+      "defaultValue": {
+        "vnetPrefix": "10.0.0.0/16",
+        "subnets": [
+          {
+            "name": "mgmt",
+            "prefix": "10.1.0.0/24"
+          },
+          {
+            "name": "ext",
+            "prefix": "10.2.0.0/24"
+          },
+          {
+            "name": "int",
+            "prefix": "10.3.0.0/24"
+          },
+          {
+            "name": "ext2",
+            "prefix": "10.4.0.0/24"
           }
-        }
-      },
-      "resources": [
-        {
-          "type": "Microsoft.Network/virtualNetworks",
-          "apiVersion": "2021-05-01",
-          "name": "[format('{0}-vnet', parameters('uniqueString'))]",
-          "location": "[parameters('location')]",
-          "tags": "[parameters('tagValues')]",
-          "properties": {
-            "copy": [
-              {
-                "name": "subnets",
-                "count": "[length(parameters('vnet').subnets)]",
-                "input": {
-                  "name": "[format('{0}-{1}-subnet', parameters('uniqueString'), parameters('vnet').subnets[copyIndex('subnets')].name)]",
-                  "properties": {
-                    "addressPrefix": "[parameters('vnet').subnets[copyIndex('subnets')].prefix]"
-                  }
-                }
+        ]
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2021-05-01",
+      "name": "[format('{0}-vnet', parameters('uniqueString'))]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tagValues')]",
+      "properties": {
+        "copy": [
+          {
+            "name": "subnets",
+            "count": "[length(parameters('vnet').subnets)]",
+            "input": {
+              "name": "[format('{0}-{1}-subnet', parameters('uniqueString'), parameters('vnet').subnets[copyIndex('subnets')].name)]",
+              "properties": {
+                "addressPrefix": "[parameters('vnet').subnets[copyIndex('subnets')].prefix]"
               }
-            ],
-            "addressSpace": {
-              "addressPrefixes": [
-                "[parameters('vnet').vnetPrefix]"
-              ]
             }
           }
+        ],
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnet').vnetPrefix]"
+          ]
         }
-      ]
-    },
-    "debugSetting": {
-       "detailLevel": "requestContent, responseContent"
+      }
     }
-  }
+  ]
 }
